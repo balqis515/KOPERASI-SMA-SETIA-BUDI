@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koperasi Sekolah Digital</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      .view-section {
+        display: none;
+      }
+      .view-section.active {
+        display: flex;
+      }
+      .role-page.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white"
+  >
+    <section
+      id="section-login"
+      class="view-section active flex-col items-center justify-center fixed inset-0 w-screen h-screen px-4 bg-gradient-to-br from-blue-600 to-indigo-800 z-50 overflow-y-auto"
+    >
+      <div
+        class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-sm md:max-w-md w-full space-y-5 my-auto"
+      >
+        <div class="text-center">
+          <span class="text-4xl">🏫</span>
+          <h2 class="text-xl md:text-2xl font-extrabold text-gray-800 mt-2">
+            KOPERASI DIGITAL SMA SETIA BUDI
+          </h2>
+          <p class="text-xs md:text-sm text-gray-400 mt-1">
+            Masuk dengan Nama & Nomor Induk
+          </p>
+        </div>
+
+        <div
+          id="login-error"
+          class="hidden bg-red-50 text-red-600 p-3 rounded-xl text-xs font-semibold border border-red-200"
+        >
+          ⚠️ Nama atau Nomor Induk salah! Periksa kembali.
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label
+              class="block text-[11px] font-bold text-gray-600 uppercase mb-1 tracking-wider"
+              >Nama Lengkap</label
+            >
+            <input
+              type="text"
+              id="login-username"
+              placeholder="Nama"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[11px] font-bold text-gray-600 uppercase mb-1 tracking-wider"
+              >Nomor Induk (Password)</label
+            >
+            <input
+              type="password"
+              id="login-password"
+              placeholder="NPM"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+            />
+          </div>
+          <button
+            onclick="prosesLogin()"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-blue-700 active:scale-[0.98] transition shadow-lg shadow-blue-600/20 cursor-pointer"
+          >
+            Masuk ke Sistem
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div
+      id="main-app"
+      class="view-section flex-col min-h-screen w-full"
+      style="display: none"
+    >
+      <nav
+        class="bg-blue-600 text-white shadow-md sticky top-0 z-40 w-full px-3 md:px-4 py-3"
+      >
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+          <div class="truncate max-w-[70%]">
+            <h1
+              class="text-base md:text-lg font-bold tracking-wide flex items-center gap-1.5"
+            >
+              🏫 Koperasi Digital
+            </h1>
+            <div class="flex items-center gap-1.5 mt-0.5 truncate">
+              <p
+                id="user-logged-in"
+                class="text-xs text-blue-100 font-medium truncate"
+              ></p>
+              <span
+                id="user-role-badge"
+                class="text-[9px] md:text-[10px] px-2 py-0.5 rounded-full font-bold uppercase shrink-0"
+              ></span>
+            </div>
+          </div>
+          <div>
+            <button
+              onclick="prosesLogout()"
+              class="text-xs bg-red-500 hover:bg-red-600 active:scale-95 px-3 py-2 rounded-xl font-bold transition cursor-pointer shadow flex items-center gap-1"
+            >
+              <span>Keluar</span> 🚪
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main
+        class="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6 w-full flex-grow"
+      >
+        <section id="role-siswa" class="role-page hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="lg:col-span-2 space-y-4">
+              <div
+                class="bg-white p-3 rounded-xl shadow-sm flex flex-wrap md:flex-nowrap gap-1.5 items-center overflow-x-auto no-scrollbar"
+              >
+                <span
+                  class="text-xs font-bold text-gray-400 uppercase tracking-wider px-1 shrink-0"
+                  >Kategori:</span
+                >
+                <button
+                  onclick="filterKategori('Semua', this)"
+                  class="kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-600 text-white shadow-sm cursor-pointer transition"
+                >
+                  Semua
+                </button>
+                <button
+                  onclick="filterKategori('Alat Tulis', this)"
+                  class="kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer transition"
+                >
+                  Alat Tulis
+                </button>
+                <button
+                  onclick="filterKategori('Atribut', this)"
+                  class="kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer transition"
+                >
+                  Atribut
+                </button>
+                <button
+                  onclick="filterKategori('Konsumsi', this)"
+                  class="kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer transition"
+                >
+                  Konsumsi
+                </button>
+              </div>
+              <div
+                id="katalog-produk"
+                class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4"
+              ></div>
+            </div>
+
+            <div
+              class="bg-white p-4 md:p-6 rounded-xl shadow-sm h-fit space-y-4"
+            >
+              <h2
+                class="text-base md:text-lg font-bold text-gray-800 flex items-center justify-between"
+              >
+                <span>🛒 Keranjang Belanja</span>
+                <span
+                  id="cart-count"
+                  class="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold"
+                  >0</span
+                >
+              </h2>
+              <hr class="border-gray-100" />
+              <div
+                id="cart-items"
+                class="space-y-3 max-h-48 lg:max-h-60 overflow-y-auto pr-1 text-xs md:text-sm text-gray-500"
+              >
+                Keranjang masih kosong.
+              </div>
+              <hr class="border-gray-100" />
+              <div
+                class="flex justify-between items-center font-bold text-gray-800 text-sm md:text-base"
+              >
+                <span>Total:</span>
+                <span id="cart-total" class="text-blue-600 font-extrabold"
+                  >Rp 0</span
+                >
+              </div>
+
+              <div id="checkout-section" class="hidden space-y-3 pt-1">
+                <div>
+                  <label
+                    class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                    >Pilih Metode Pembayaran:</label
+                  >
+                  <select
+                    id="metode-bayar"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 bg-gray-50 focus:outline-none focus:border-blue-500 cursor-pointer"
+                  >
+                    <option value="QRIS / E-Wallet">
+                      📱 QRIS / E-Wallet (Dana/Ovo/Gopay)
+                    </option>
+                    <option value="Transfer Bank VA">
+                      🏦 Transfer Bank Virtual Account
+                    </option>
+                    <option value="Tunai di Koperasi">
+                      💵 Tunai di Kasir Koperasi
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1"
+                    >Upload Bukti Bayar / Foto:</label
+                  >
+                  <input
+                    type="file"
+                    id="bukti-bayar"
+                    class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                  />
+                </div>
+                <button
+                  onclick="prosesCheckout()"
+                  class="w-full bg-green-500 text-white py-2.5 rounded-xl font-bold hover:bg-green-600 active:scale-95 transition text-sm cursor-pointer shadow-md shadow-green-500/10"
+                >
+                  Kirim Pesanan
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="role-admin" class="role-page hidden space-y-4">
+          <h2 class="text-xl md:text-2xl font-extrabold text-gray-800">
+            🎛️ Dashboard Admin
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div
+              class="bg-white p-3.5 rounded-xl shadow-sm border-l-4 border-blue-500"
+            >
+              <p
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Total Produk
+              </p>
+              <p class="text-lg font-bold text-gray-800 mt-0.5">11 Item</p>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-xl shadow-sm border-l-4 border-yellow-500"
+            >
+              <p
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Pesanan Masuk
+              </p>
+              <p
+                id="admin-pending-orders"
+                class="text-lg font-bold text-gray-800 mt-0.5"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-xl shadow-sm border-l-4 border-green-500"
+            >
+              <p
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Pendapatan
+              </p>
+              <p
+                id="admin-revenue"
+                class="text-lg font-bold text-gray-800 mt-0.5"
+              >
+                Rp 0
+              </p>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-xl shadow-sm border-l-4 border-purple-500"
+            >
+              <p
+                class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"
+              >
+                Stok Kritis
+              </p>
+              <p class="text-lg font-bold text-red-500 mt-0.5">2 Item</p>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
+          >
+            <div class="p-4 bg-gray-50 border-b border-gray-100">
+              <h3 class="font-bold text-gray-700 text-sm">
+                📦 Verifikasi Pesanan Masuk
+              </h3>
+            </div>
+            <div class="overflow-x-auto w-full">
+              <table
+                class="w-full text-left text-xs min-w-[700px] md:min-w-full"
+              >
+                <thead>
+                  <tr
+                    class="text-gray-400 bg-gray-50/50 border-b border-gray-200"
+                  >
+                    <th class="p-3 font-bold uppercase tracking-wider">ID</th>
+                    <th class="p-3 font-bold uppercase tracking-wider">
+                      Pembeli
+                    </th>
+                    <th class="p-3 font-bold uppercase tracking-wider">
+                      Item Belanja
+                    </th>
+                    <th class="p-3 font-bold uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th class="p-3 font-bold uppercase tracking-wider">
+                      Metode
+                    </th>
+                    <th class="p-3 font-bold uppercase tracking-wider">
+                      Bukti
+                    </th>
+                    <th
+                      class="p-3 font-bold uppercase tracking-wider text-center"
+                    >
+                      Aksi
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="admin-order-table"
+                  class="text-gray-600 divide-y divide-gray-100"
+                >
+                  <tr>
+                    <td
+                      colspan="7"
+                      class="p-6 text-center text-gray-400 font-medium"
+                    >
+                      Belum ada pesanan masuk dari siswa.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="role-kepsek"
+          class="role-page hidden space-y-4 md:space-y-6"
+        >
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-200 pb-3 gap-2"
+          >
+            <div>
+              <h2 class="text-xl md:text-2xl font-extrabold text-gray-800">
+                📈 Monitor Utama Kepsek
+              </h2>
+              <p class="text-[11px] text-gray-400 mt-0.5">
+                Laporan Keuangan & Inventaris Real-Time
+              </p>
+            </div>
+            <span
+              class="bg-green-100 text-green-700 font-bold text-[10px] px-2.5 py-1 rounded-full shrink-0"
+              >🟢 Sistem Aktif</span
+            >
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div
+              class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+            >
+              <p
+                class="text-[10px] font-bold uppercase text-gray-400 tracking-wider"
+              >
+                Omzet Koperasi
+              </p>
+              <p
+                id="kepsek-revenue"
+                class="text-lg md:text-xl font-extrabold text-blue-600 mt-1"
+              >
+                Rp 0
+              </p>
+            </div>
+            <div
+              class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+            >
+              <p
+                class="text-[10px] font-bold uppercase text-gray-400 tracking-wider"
+              >
+                Transaksi Sukses
+              </p>
+              <p
+                id="kepsek-tx-count"
+                class="text-lg md:text-xl font-extrabold text-gray-800 mt-1"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+            >
+              <p
+                class="text-[10px] font-bold uppercase text-gray-400 tracking-wider"
+              >
+                Rata-Rata Belanja
+              </p>
+              <p
+                id="kepsek-avg-sales"
+                class="text-lg md:text-xl font-extrabold text-gray-800 mt-1"
+              >
+                Rp 0
+              </p>
+            </div>
+            <div
+              class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"
+            >
+              <p
+                class="text-[10px] font-bold uppercase text-gray-400 tracking-wider"
+              >
+                Logistik Kritis
+              </p>
+              <p class="text-lg md:text-xl font-extrabold text-red-500 mt-1">
+                2 Item
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div
+              class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2 space-y-4"
+            >
+              <h3
+                class="font-bold text-gray-800 text-xs md:text-sm tracking-wide"
+              >
+                📊 Proporsi Omzet Per Kategori Produk
+              </h3>
+              <div class="space-y-3 pt-1">
+                <div>
+                  <div
+                    class="flex justify-between text-[11px] font-semibold mb-1 text-gray-600"
+                  >
+                    <span>Alat Tulis & Buku</span
+                    ><span id="graph-val-tulis" class="font-bold">Rp 0</span>
+                  </div>
+                  <div
+                    class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden"
+                  >
+                    <div
+                      id="graph-bar-tulis"
+                      class="bg-blue-500 h-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="flex justify-between text-[11px] font-semibold mb-1 text-gray-600"
+                  >
+                    <span>Atribut & Seragam</span
+                    ><span id="graph-val-atribut" class="font-bold">Rp 0</span>
+                  </div>
+                  <div
+                    class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden"
+                  >
+                    <div
+                      id="graph-bar-atribut"
+                      class="bg-purple-500 h-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="flex justify-between text-[11px] font-semibold mb-1 text-gray-600"
+                  >
+                    <span>Makanan & Minuman</span
+                    ><span id="graph-val-konsumsi" class="font-bold">Rp 0</span>
+                  </div>
+                  <div
+                    class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden"
+                  >
+                    <div
+                      id="graph-bar-konsumsi"
+                      class="bg-orange-500 h-full transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 space-y-3"
+            >
+              <h3
+                class="font-bold text-gray-800 text-xs md:text-sm tracking-wide"
+              >
+                📦 Pemantauan Stok Sisa
+              </h3>
+              <div
+                class="divide-y divide-gray-50 max-h-40 overflow-y-auto pr-1"
+              >
+                <div class="py-2 flex justify-between text-[11px]">
+                  <span class="text-gray-500 truncate mr-2"
+                    >Buku Tulis Sidu</span
+                  ><span
+                    class="font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full shrink-0"
+                    >100 Pcs</span
+                  >
+                </div>
+                <div class="py-2 flex justify-between text-[11px]">
+                  <span class="text-gray-500 truncate mr-2"
+                    >Seragam OSIS SMA</span
+                  ><span
+                    class="font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full shrink-0"
+                    >12 Pcs</span
+                  >
+                </div>
+                <div class="py-2 flex justify-between text-[11px]">
+                  <span class="text-gray-500 truncate mr-2">Topi Sekolah</span
+                  ><span
+                    class="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full shrink-0"
+                    >2 Pcs</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="p-4 bg-gray-50 border-b border-gray-100">
+              <h3 class="font-bold text-gray-700 text-xs md:text-sm">
+                📑 Jurnal Audit Transaksi Masuk (Selesai)
+              </h3>
+            </div>
+            <div class="overflow-x-auto w-full">
+              <table
+                class="w-full text-left text-xs min-w-[650px] md:min-w-full"
+              >
+                <thead>
+                  <tr
+                    class="text-gray-400 bg-gray-50/50 border-b border-gray-100"
+                  >
+                    <th class="p-3">Waktu</th>
+                    <th class="p-3">ID Transaksi</th>
+                    <th class="p-3">Siswa Pembeli</th>
+                    <th class="p-3">Item Terjual</th>
+                    <th class="p-3">Metode Bayar</th>
+                    <th class="p-3 text-right">Nilai Rupiah</th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="kepsek-audit-table"
+                  class="text-gray-600 divide-y divide-gray-50"
+                >
+                  <tr>
+                    <td
+                      colspan="6"
+                      class="p-6 text-center text-gray-400 font-medium"
+                    >
+                      Belum ada rekaman audit transaksi.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const validUsers = [
+        {
+          nama: "Muhammad Muflih Nawwaf",
+          pin: "12401101050132",
+          role: "kepsek",
+        },
+        { nama: "Alya Safira", pin: "12401101050140", role: "admin" },
+        {
+          nama: "Nasywa aulia putri efendi",
+          pin: "12401101050122",
+          role: "siswa",
+        },
+        { nama: "Hesti Nur Ayda", pin: "12401101050137", role: "siswa" },
+        {
+          nama: "Rifdah Rizqiana Ramadhani",
+          pin: "12401101050121",
+          role: "siswa",
+        },
+      ];
+
+      const produkData = [
+        {
+          id: 1,
+          nama: "Buku Tulis Sidu",
+          kategori: "Alat Tulis",
+          harga: 5000,
+          stok: 100,
+          img: "📝",
+        },
+        {
+          id: 2,
+          nama: "Pulpen Gel Hitam",
+          kategori: "Alat Tulis",
+          harga: 3500,
+          stok: 150,
+          img: "🖊️",
+        },
+        {
+          id: 3,
+          nama: "Buku Pelajaran Mat",
+          kategori: "Alat Tulis",
+          harga: 45000,
+          stok: 85,
+          img: "📚",
+        },
+        {
+          id: 4,
+          nama: "Seragam OSIS SMA",
+          kategori: "Atribut",
+          harga: 95000,
+          stok: 12,
+          img: "👕",
+        },
+        {
+          id: 5,
+          nama: "Dasi Logo Sekolah",
+          kategori: "Atribut",
+          harga: 15000,
+          stok: 50,
+          img: "👔",
+        },
+        {
+          id: 6,
+          nama: "Topi Sekolah",
+          kategori: "Atribut",
+          harga: 20000,
+          stok: 2,
+          img: "🧢",
+        },
+        {
+          id: 7,
+          nama: "Kaos Olahraga",
+          kategori: "Atribut",
+          harga: 75000,
+          stok: 25,
+          img: "🎽",
+        },
+        {
+          id: 8,
+          nama: "Roti Sandwich",
+          kategori: "Konsumsi",
+          harga: 6000,
+          stok: 40,
+          img: "🥪",
+        },
+        {
+          id: 9,
+          nama: "Susu Kotak UHT",
+          kategori: "Konsumsi",
+          harga: 5000,
+          stok: 60,
+          img: "🧃",
+        },
+        {
+          id: 10,
+          nama: "Voucher Fotokopi",
+          kategori: "Alat Tulis",
+          harga: 10000,
+          stok: 200,
+          img: "🎟️",
+        },
+        {
+          id: 11,
+          nama: "Gantungan Kunci",
+          kategori: "Atribut",
+          harga: 8000,
+          stok: 30,
+          img: "🔑",
+        },
+      ];
+
+      let currentUser = null;
+      let currentRole = null;
+      let keranjang = [];
+      let pesananMasuk = [];
+      let totalPendapatan = 0;
+      let revenueKategori = { "Alat Tulis": 0, Atribut: 0, Konsumsi: 0 };
+
+      function prosesLogin() {
+        const inputUser = document
+          .getElementById("login-username")
+          .value.trim();
+        const inputPin = document.getElementById("login-password").value.trim();
+        const errorDiv = document.getElementById("login-error");
+
+        const userKetemu = validUsers.find(
+          (u) =>
+            u.nama.toLowerCase() === inputUser.toLowerCase() &&
+            u.pin === inputPin,
+        );
+
+        if (userKetemu) {
+          currentUser = userKetemu.nama;
+          currentRole = userKetemu.role;
+          errorDiv.classList.add("hidden");
+
+          document.getElementById("section-login").classList.remove("active");
+          document.getElementById("section-login").style.display = "none";
+
+          const mainApp = document.getElementById("main-app");
+          mainApp.classList.add("active");
+          mainApp.style.display = "flex";
+
+          document.getElementById("user-logged-in").innerText = currentUser;
+          const badge = document.getElementById("user-role-badge");
+          badge.innerText = currentRole;
+
+          if (currentRole === "kepsek")
+            badge.className =
+              "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-orange-100 text-orange-700";
+          else if (currentRole === "admin")
+            badge.className =
+              "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-purple-100 text-purple-700";
+          else
+            badge.className =
+              "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-blue-100 text-blue-700";
+
+          bukaHalamanSesuaiRole(currentRole);
+        } else {
+          errorDiv.classList.remove("hidden");
+        }
+      }
+
+      function bukaHalamanSesuaiRole(role) {
+        document
+          .querySelectorAll(".role-page")
+          .forEach((p) => p.classList.add("hidden"));
+        document.getElementById(`role-${role}`).classList.remove("hidden");
+
+        if (role === "siswa") renderKatalog();
+        if (role === "admin") renderAdminTable();
+        if (role === "kepsek") renderKepsekDashboard();
+      }
+
+      function prosesLogout() {
+        currentUser = null;
+        currentRole = null;
+        keranjang = [];
+        document.getElementById("login-username").value = "";
+        document.getElementById("login-password").value = "";
+        document.getElementById("main-app").classList.remove("active");
+        document.getElementById("main-app").style.display = "none";
+
+        const loginSec = document.getElementById("section-login");
+        loginSec.classList.add("active");
+        loginSec.style.display = "flex";
+      }
+
+      function renderKatalog(kategoriFilter = "Semua") {
+        const container = document.getElementById("katalog-produk");
+        container.innerHTML = "";
+        const produkDisaring =
+          kategoriFilter === "Semua"
+            ? produkData
+            : produkData.filter((p) => p.kategori === kategoriFilter);
+
+        produkDisaring.forEach((p) => {
+          container.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:shadow-md">
+                        <div>
+                            <div class="text-2xl mb-1">${p.img}</div>
+                            <span class="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wide">${p.kategori}</span>
+                            <h4 class="font-bold text-gray-800 mt-1 text-xs line-clamp-2 min-h-[2rem]">${p.nama}</h4>
+                            <p class="text-blue-600 font-extrabold text-xs mt-0.5">Rp ${p.harga.toLocaleString("id-ID")}</p>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-[10px] text-gray-400 mb-1.5">Stok: ${p.stok}</p>
+                            <button onclick="tambahKeKeranjang(${p.id})" class="w-full bg-blue-600 text-white text-[11px] py-1.5 rounded-lg font-bold hover:bg-blue-700 active:bg-blue-800 transition cursor-pointer">
+                                + Keranjang
+                            </button>
+                        </div>
+                    </div>`;
+        });
+      }
+
+      function filterKategori(kategori, el) {
+        document.querySelectorAll(".kat-btn").forEach((btn) => {
+          btn.className =
+            "kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer transition shrink-0";
+        });
+        el.className =
+          "kat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-600 text-white shadow-sm cursor-pointer transition shrink-0";
+        renderKatalog(kategori);
+      }
+
+      function tambahKeKeranjang(id) {
+        const produk = produkData.find((p) => p.id === id);
+        const itemDiKeranjang = keranjang.find((item) => item.id === id);
+        if (itemDiKeranjang) {
+          itemDiKeranjang.qty++;
+        } else {
+          keranjang.push({ ...produk, qty: 1 });
+        }
+        updateKeranjangTampilan();
+      }
+
+      function updateKeranjangTampilan() {
+        const container = document.getElementById("cart-items");
+        const totalText = document.getElementById("cart-total");
+        const countText = document.getElementById("cart-count");
+        const checkoutSec = document.getElementById("checkout-section");
+
+        if (keranjang.length === 0) {
+          container.innerHTML = "Keranjang masih kosong.";
+          totalText.innerText = "Rp 0";
+          countText.innerText = "0";
+          checkoutSec.classList.add("hidden");
+          return;
+        }
+
+        container.innerHTML = "";
+        let total = 0;
+        let totalQty = 0;
+        keranjang.forEach((item) => {
+          total += item.harga * item.qty;
+          totalQty += item.qty;
+          container.innerHTML += `
+                    <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                        <div class="max-w-[70%]">
+                            <p class="font-bold text-gray-800 text-xs truncate">${item.nama}</p>
+                            <p class="text-[10px] text-gray-400">${item.qty} x Rp ${item.harga.toLocaleString("id-ID")}</p>
+                        </div>
+                        <p class="font-extrabold text-gray-700 text-xs shrink-0">Rp ${(item.harga * item.qty).toLocaleString("id-ID")}</p>
+                    </div>`;
+        });
+        totalText.innerText = `Rp ${total.toLocaleString("id-ID")}`;
+        countText.innerText = totalQty;
+        checkoutSec.classList.remove("hidden");
+      }
+
+      function prosesCheckout() {
+        const total = keranjang.reduce(
+          (sum, item) => sum + item.harga * item.qty,
+          0,
+        );
+        const itemsNama = keranjang
+          .map((i) => `${i.nama} (${i.qty}x)`)
+          .join(", ");
+        const metodeDipilih = document.getElementById("metode-bayar").value;
+
+        let rincianKat = {};
+        keranjang.forEach((i) => {
+          rincianKat[i.kategori] =
+            (rincianKat[i.kategori] || 0) + i.harga * i.qty;
+        });
+
+        pesananMasuk.push({
+          id: "TRX-" + Math.floor(1000 + Math.random() * 9000),
+          pembeli: currentUser,
+          items: itemsNama,
+          total: total,
+          status: "Pending",
+          metode: metodeDipilih,
+          breakdown: rincianKat,
+          bukti: document.getElementById("bukti-bayar").value
+            ? "📄 Terunggah"
+            : "❌ No File",
+        });
+
+        keranjang = [];
+        updateKeranjangTampilan();
+        alert(
+          "🚀 Pesanan dikirim! Silakan hubungi Admin (Alya Safira) untuk verifikasi pembayaran.",
+        );
+      }
+
+      function renderAdminTable() {
+        const tbody = document.getElementById("admin-order-table");
+        const pendingText = document.getElementById("admin-pending-orders");
+        pendingText.innerText = pesananMasuk.filter(
+          (p) => p.status === "Pending",
+        ).length;
+        document.getElementById("admin-revenue").innerText =
+          `Rp ${totalPendapatan.toLocaleString("id-ID")}`;
+
+        if (pesananMasuk.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">Belum ada pesanan masuk.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = "";
+        pesananMasuk.forEach((p, index) => {
+          tbody.innerHTML += `
+                    <tr class="border-b border-gray-50 hover:bg-gray-50 text-xs">
+                        <td class="p-3 font-mono font-bold text-blue-600">${p.id}</td>
+                        <td class="p-3 font-semibold text-gray-700">${p.pembeli}</td>
+                        <td class="p-3 max-w-[150px] truncate">${p.items}</td>
+                        <td class="p-3 font-bold text-gray-800">Rp ${p.total.toLocaleString("id-ID")}</td>
+                        <td class="p-3"><span class="bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded-md text-[10px]">${p.metode}</span></td>
+                        <td class="p-3 text-gray-400">${p.bukti}</td>
+                        <td class="p-3 text-center">
+                            ${
+                              p.status === "Pending"
+                                ? `<button onclick="setujuiPesanan(${index})" class="bg-green-500 text-white text-[11px] px-2.5 py-1 rounded-lg hover:bg-green-600 font-bold transition shadow-sm cursor-pointer">Verifikasi</button>`
+                                : `<span class="text-green-600 font-bold">✓ Selesai</span>`
+                            }
+                        </td>
+                    </tr>`;
+        });
+      }
+
+      function setujuiPesanan(index) {
+        pesananMasuk[index].status = "Selesai";
+        totalPendapatan += pesananMasuk[index].total;
+
+        const bd = pesananMasuk[index].breakdown;
+        for (let kat in bd) {
+          if (revenueKategori[kat] !== undefined)
+            revenueKategori[kat] += bd[kat];
+        }
+        renderAdminTable();
+        alert("✓ Pembayaran sukses diverifikasi!");
+      }
+
+      function renderKepsekDashboard() {
+        document.getElementById("kepsek-revenue").innerText =
+          `Rp ${totalPendapatan.toLocaleString("id-ID")}`;
+        const lulusOrders = pesananMasuk.filter((p) => p.status === "Selesai");
+        document.getElementById("kepsek-tx-count").innerText =
+          lulusOrders.length;
+        const rataRata =
+          lulusOrders.length > 0
+            ? Math.round(totalPendapatan / lulusOrders.length)
+            : 0;
+        document.getElementById("kepsek-avg-sales").innerText =
+          `Rp ${rataRata.toLocaleString("id-ID")}`;
+
+        const tbodyAudit = document.getElementById("kepsek-audit-table");
+        if (lulusOrders.length === 0) {
+          tbodyAudit.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400 font-medium">Belum ada rekaman audit transaksi.</td></tr>`;
+        } else {
+          tbodyAudit.innerHTML = "";
+          lulusOrders.forEach((p) => {
+            const jam = new Date().toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            tbodyAudit.innerHTML += `
+                        <tr class="hover:bg-gray-50/80 transition text-xs">
+                            <td class="p-3 text-gray-400 font-medium">${jam}</td>
+                            <td class="p-3 font-mono font-bold text-gray-700">${p.id}</td>
+                            <td class="p-3 text-gray-900 font-semibold">${p.pembeli}</td>
+                            <td class="p-3 text-gray-500 max-w-[150px] truncate">${p.items}</td>
+                            <td class="p-3"><span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded text-[10px]">${p.metode}</span></td>
+                            <td class="p-3 font-bold text-green-600 text-right">+ Rp ${p.total.toLocaleString("id-ID")}</td>
+                        </tr>`;
+          });
+        }
+
+        document.getElementById("graph-val-tulis").innerText =
+          `Rp ${revenueKategori["Alat Tulis"].toLocaleString("id-ID")}`;
+        document.getElementById("graph-val-atribut").innerText =
+          `Rp ${revenueKategori["Atribut"].toLocaleString("id-ID")}`;
+        document.getElementById("graph-val-konsumsi").innerText =
+          `Rp ${revenueKategori["Consumsi"].toLocaleString("id-ID")}`;
+
+        let maxVal = Math.max(
+          revenueKategori["Alat Tulis"],
+          revenueKategori["Atribut"],
+          revenueKategori["Konsumsi"],
+        );
+        if (maxVal > 0) {
+          document.getElementById("graph-bar-tulis").style.width =
+            `${(revenueKategori["Alat Tulis"] / maxVal) * 100}%`;
+          document.getElementById("graph-bar-atribut").style.width =
+            `${(revenueKategori["Atribut"] / maxVal) * 100}%`;
+          document.getElementById("graph-bar-konsumsi").style.width =
+            `${(revenueKategori["Konsumsi"] / maxVal) * 100}%`;
+        } else {
+          document.getElementById("graph-bar-tulis").style.width = `0%`;
+          document.getElementById("graph-bar-atribut").style.width = `0%`;
+          document.getElementById("graph-bar-konsumsi").style.width = `0%`;
+        }
+      }
+    </script>
+  </body>
+</html>
